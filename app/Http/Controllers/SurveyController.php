@@ -9,9 +9,9 @@ use App\Http\Requests\UpdateSurveyRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\SurveyQuestion;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum;
@@ -24,8 +24,7 @@ class SurveyController extends Controller
     public function index(Request $request)
     {
         $user= $request->user();
-
-        $surveys = Survey::where('user_id',$user->id)->orderBy('id','desc')->paginate(10);
+        $surveys = Survey::where('user_id',$user->id)->orderBy('id','desc')->paginate(2);
         return SurveyResource::collection($surveys);
     }
 
