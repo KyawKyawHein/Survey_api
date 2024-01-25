@@ -27,7 +27,7 @@ class UpdateSurveyRequest extends FormRequest
     {
         return [
             "title"=>['required','string'],
-            "image"=>['required','nullable'],
+            "image"=>['string'],
             "user_id"=>['exists:users,id'],
             "status"=>['required','boolean'],
             "description"=>['string'],

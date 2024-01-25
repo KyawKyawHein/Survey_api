@@ -109,6 +109,9 @@ class SurveyController extends Controller
         // Find questions to add
         $toAdd = array_diff($newIds,$existingIds);
 
+        //Delete quesions by array
+        SurveyQuestion::destroy($toDelete);
+
         // Create new questions
         foreach($data['questions'] as $question){
             if(in_array($question['id'],$toAdd)){

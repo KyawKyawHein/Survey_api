@@ -20,7 +20,7 @@ class SurveyResource extends JsonResource
             "id"=>$this->id,
             "title"=>$this->title,
             "slug"=>$this->slug,
-            "image"=>$this->image? URL::to($this->image):null,
+            "image_url"=>$this->image? URL::to($this->image):null,
             "status"=>$this->status,
             "description"=>$this->description,
             "questions" => SurveyQuestionResource::collection($this->questions),
