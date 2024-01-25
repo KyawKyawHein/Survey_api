@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enum\QuestionTypeEnum;
+use App\Http\Requests\StoreSurveyAnswerRequest;
 use App\Models\Survey;
 use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
 use App\Http\Resources\SurveyResource;
+use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
+use App\Models\SurveyQuestionAnswer;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -66,6 +69,19 @@ class SurveyController extends Controller
         $user = $request->user();
         if($user->id !== $survey->user_id){
             return abort(403,"Unauthorized Access");
+        }
+        return new SurveyResource($survey);
+    }
+
+    //get survey by slug
+    public function getSurveyBySlug(Survey $survey){
+        if(!$survey){
+            return response('',404);
+        }
+        $currentDate = new \DateTime();
+        $expireDate = new \DateTime($survey->expire_date);
+        if($currentDate > $expireDate){
+            return response('',404);
         }
         return new SurveyResource($survey);
     }
@@ -208,5 +224,33 @@ class SurveyController extends Controller
             'data' => ['present'],
         ]);
         return $question->update($validator->validated());
+    }
+
+    // store answers of survey
+    public function storeAnswer(StoreSurveyAnswerRequest $request,Survey $survey){
+        $data = $request->validated();
+        // create survey answer
+        $surveyAnswer = SurveyAnswer::create([
+            "survey_id"=>$survey->id,
+            "start_date"=>date('Y-m-d H:i:s'),
+            "end_date"=>date('Y-m-d H:i:s')
+        ]);
+
+        // map survey answer and add into survey question answer table
+        foreach($data['answer'] as $questionId=>$answer){
+            $question = SurveyQuestion::where(['id'=> $questionId, 'survey_id'=> $survey->id])->get();
+            if(!$question){
+                return response("Invalid question id". $questionId,400);
+            }
+
+            $data = [
+                "survey_question_id"=>$questionId,
+                "survey_answer_id"=>$surveyAnswer->id,
+                "answer"=>is_array($answer) ? json_encode($answer) : $answer
+            ];
+
+            SurveyQuestionAnswer::create($data);
+        }
+        return response('',201);
     }
 }

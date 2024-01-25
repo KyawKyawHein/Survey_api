@@ -23,8 +23,11 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout',[AuthController::class,'logout']);
     Route::apiResource('survey',SurveyController::class);
     Route::get('/me',[AuthController::class,'me']);
+    // Route::get('/dashboard',[])
 });
 
 
 Route::post('/register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login']);
+Route::get('/survey/public-view/{survey:slug}',[SurveyController::class,'getSurveyBySlug']);
+Route::post('/survey/{survey:slug}/answer',[SurveyController::class,'storeAnswer']);
